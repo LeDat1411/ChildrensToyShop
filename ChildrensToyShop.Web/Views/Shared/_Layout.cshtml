@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Little Lantern Toy Shop</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="site-header">
+        <nav class="navbar navbar-expand-lg navbar-dark container">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">Little Lantern <span>Toy Shop</span></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+                <div id="nav" class="navbar-collapse collapse">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item"><a class="nav-link" asp-controller="Products" asp-action="Index">Shop toys</a></li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Cart" asp-action="Index">My cart</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Orders" asp-action="Index">Orders</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Reviews" asp-action="Index">Reviews</a></li>
+                        }
+                        @if (User.IsInRole("Admin")) { <li class="nav-item"><a class="nav-link" asp-controller="Products" asp-action="Create">Add toy</a></li> }
+                    </ul>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <span class="navbar-text me-3">Hi, @User.Identity.Name</span>
+                        <form asp-controller="Auth" asp-action="Logout" method="post"><button class="btn btn-outline-light btn-sm">Sign out</button></form>
+                    }
+                    else { <a class="btn btn-light btn-sm" asp-controller="Auth" asp-action="Login">Sign in</a> }
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container page-shell">
+        @if (TempData["Success"] is string success) { <div class="alert alert-success alert-dismissible fade show" role="alert">@success<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div> }
+        @if (TempData["Error"] is string error) { <div class="alert alert-danger alert-dismissible fade show" role="alert">@error<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div> }
+        <main role="main" class="pb-4">@RenderBody()</main>
+    </div>
+    <footer class="footer text-muted"><div class="container">&copy; 2026 Little Lantern Toy Shop &middot; Safe, playful shopping</div></footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

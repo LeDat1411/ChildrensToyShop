@@ -1,0 +1,2 @@
+@model Product
+<article class="product-card"><div class="product-mark">@Model.Category.Substring(0, 1)</div><div class="product-content"><p class="eyebrow">@Model.Brand · @Model.AgeRange</p><h3>@Model.Title</h3><p class="text-muted clamp">@Model.Description</p><div class="d-flex justify-content-between align-items-center"><strong class="price">$@Model.Price.ToString("0.00")</strong><a class="btn btn-sm btn-outline-primary" asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id">See toy</a></div></div></article>

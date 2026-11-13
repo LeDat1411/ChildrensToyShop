@@ -1,0 +1,4 @@
+@model IEnumerable<Review>
+@{ ViewData["Title"] = User.IsInRole("Admin") ? "Review moderation" : "My reviews"; }
+<div class="section-heading"><div><p class="eyebrow">Parent feedback</p><h1>@ViewData["Title"]</h1></div></div>
+@if(!Model.Any()){<div class="empty-state"><h2>No reviews here yet.</h2><a asp-controller="Products" asp-action="Index">Browse toys</a></div>}else{foreach(var review in Model){<article class="review"><div class="d-flex justify-content-between"><div><strong>@review.Product?.Title</strong><p class="mb-1">@review.Rating / 5 stars · @review.ActualAgeSuitability</p></div><span class="status">@review.VisibilityStatus</span></div><p>@review.Comment</p><a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@review.Id">Edit</a><form asp-action="Delete" asp-route-id="@review.Id" method="post" class="d-inline"><button class="btn btn-sm btn-link text-danger">Delete</button></form></article>}}

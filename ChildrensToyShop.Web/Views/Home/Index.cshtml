@@ -1,0 +1,8 @@
+@model IEnumerable<Product>
+@{ ViewData["Title"] = "Welcome"; }
+<section class="hero">
+    <div><p class="eyebrow">Play starts here</p><h1>Curious minds deserve <em>brilliant</em> toys.</h1><p>Thoughtful toys with clear age guidance, safety notes, and stock you can trust.</p><a class="btn btn-warning btn-lg" asp-controller="Products" asp-action="Index">Explore the collection</a></div>
+    <div class="hero-shapes" aria-hidden="true"><span>★</span><span>●</span><span>▲</span></div>
+</section>
+<section class="mt-5"><div class="d-flex justify-content-between align-items-end mb-3"><div><p class="eyebrow">In the shop</p><h2>Ready for playtime</h2></div><a asp-controller="Products" asp-action="Index">View all toys</a></div><div class="row g-4">@foreach (var product in Model) { <div class="col-md-4"><partial name="_ProductCard" model="product" /></div> }</div></section>
+<section class="feature-row mt-5"><div><strong>Age-aware</strong><span>Find the right fit by stage.</span></div><div><strong>Safety first</strong><span>Clear product information.</span></div><div><strong>Simple checkout</strong><span>Safe simulated payments.</span></div></section>

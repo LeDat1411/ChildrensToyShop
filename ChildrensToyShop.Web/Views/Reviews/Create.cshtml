@@ -1,0 +1,4 @@
+@model Review
+@{ ViewData["Title"] = "Write a review"; }
+<div class="form-card"><p class="eyebrow">@ViewBag.ProductTitle</p><h1>Share your experience</h1><form method="post"><input asp-for="ProductId" type="hidden"/><partial name="_ReviewForm" model="Model"/><button class="btn btn-primary mt-4">Submit review</button></form></div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
