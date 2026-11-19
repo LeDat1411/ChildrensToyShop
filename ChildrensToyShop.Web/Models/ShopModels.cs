@@ -19,15 +19,19 @@ public class Product
     [Required, StringLength(40)] public string Sku { get; set; } = string.Empty;
     [Required, StringLength(140)] public string Title { get; set; } = string.Empty;
     [Required, StringLength(2000)] public string Description { get; set; } = string.Empty;
-    [Range(0.01, 999999)] public decimal Price { get; set; }
+    [Range(0.01, 999999, ErrorMessage = "Price must be between $0.01 and $999,999.00.")]
+    public decimal Price { get; set; }
     [Required, StringLength(40)] public string AgeRange { get; set; } = string.Empty;
     [Required, StringLength(60)] public string Category { get; set; } = string.Empty;
     [Required, StringLength(60)] public string Brand { get; set; } = string.Empty;
-    [StringLength(240)] public string SafetyNotes { get; set; } = string.Empty;
-    [StringLength(100)] public string SafetyCertification { get; set; } = string.Empty;
-    [Range(0, 999999)] public int StockQuantity { get; set; }
-    [Range(0, 999999)] public int ReorderThreshold { get; set; } = 10;
-    [Required, StringLength(20)] public string Status { get; set; } = ProductStatus.Active;
+    [StringLength(240)] public string? SafetyNotes { get; set; } = string.Empty;
+    [StringLength(100)] public string? SafetyCertification { get; set; } = string.Empty;
+    [Display(Name = "Stock quantity"), Range(0, 999999, ErrorMessage = "Stock quantity must be between 0 and 999,999.")]
+    public int StockQuantity { get; set; }
+    [Display(Name = "Reorder threshold"), Range(0, 999999, ErrorMessage = "Reorder threshold must be between 0 and 999,999.")]
+    public int ReorderThreshold { get; set; } = 10;
+    [Required, RegularExpression("Active|Recalled|Discontinued", ErrorMessage = "Select a valid toy status.")]
+    [StringLength(20)] public string Status { get; set; } = ProductStatus.Active;
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
@@ -40,6 +44,7 @@ public class ShoppingCart
     public int Id { get; set; }
     public int UserId { get; set; }
     public AppUser? User { get; set; }
+    [StringLength(1)] public string? CouponCode { get; set; }
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public ICollection<CartItem> Items { get; set; } = new List<CartItem>();
 }
@@ -67,6 +72,8 @@ public class Order
     public decimal Subtotal { get; set; }
     public decimal Tax { get; set; }
     public decimal GiftWrapFee { get; set; }
+    [StringLength(1)] public string? CouponCode { get; set; }
+    public decimal DiscountAmount { get; set; }
     public decimal Total { get; set; }
     public bool IsArchived { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

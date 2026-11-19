@@ -1,4 +1,87 @@
 @model Product
-@{ ViewData["Title"] = Model.Id == 0 ? "Add toy" : "Edit toy"; var isNew = Model.Id == 0; }
-<div class="form-card"><p class="eyebrow">Inventory management</p><h1>@ViewData["Title"]</h1><form method="post" asp-action="@(isNew ? "Create" : "Edit")"><input asp-for="Id" type="hidden" /><input asp-for="CreatedAt" type="hidden" /><div asp-validation-summary="ModelOnly" class="text-danger"></div><div class="row g-3"><div class="col-md-4"><label asp-for="Sku" class="form-label"></label><input asp-for="Sku" class="form-control" /></div><div class="col-md-8"><label asp-for="Title" class="form-label"></label><input asp-for="Title" class="form-control" /></div><div class="col-12"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" class="form-control" rows="3"></textarea></div><div class="col-md-3"><label asp-for="Price" class="form-label"></label><input asp-for="Price" class="form-control" /></div><div class="col-md-3"><label asp-for="StockQuantity" class="form-label"></label><input asp-for="StockQuantity" class="form-control" /></div><div class="col-md-3"><label asp-for="ReorderThreshold" class="form-label"></label><input asp-for="ReorderThreshold" class="form-control" /></div><div class="col-md-3"><label asp-for="Status" class="form-label"></label><select asp-for="Status" class="form-select"><option>Active</option><option>Recalled</option><option>Discontinued</option></select></div><div class="col-md-4"><label asp-for="AgeRange" class="form-label"></label><input asp-for="AgeRange" class="form-control" /></div><div class="col-md-4"><label asp-for="Category" class="form-label"></label><input asp-for="Category" class="form-control" /></div><div class="col-md-4"><label asp-for="Brand" class="form-label"></label><input asp-for="Brand" class="form-control" /></div><div class="col-md-6"><label asp-for="SafetyCertification" class="form-label"></label><input asp-for="SafetyCertification" class="form-control" /></div><div class="col-md-6"><label asp-for="SafetyNotes" class="form-label"></label><input asp-for="SafetyNotes" class="form-control" /></div><div class="col-12"><label class="form-check"><input asp-for="IsActive" class="form-check-input" /> Active listing</label></div></div><div class="mt-4"><button class="btn btn-primary">Save toy</button><a class="btn btn-link" asp-action="Index">Cancel</a></div></form></div>
+@{
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = isNew ? "Add toy" : "Edit toy";
+}
+<div class="form-card">
+    <p class="eyebrow">Inventory management</p>
+    <h1>@ViewData["Title"]</h1>
+    <form method="post" asp-action="@(isNew ? "Create" : "Edit")" novalidate>
+        <input asp-for="Id" type="hidden" />
+        <div asp-validation-summary="All" class="text-danger mb-3" role="alert"></div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label asp-for="Sku" class="form-label"></label>
+                <input asp-for="Sku" class="form-control" aria-describedby="Sku-error" />
+                <span asp-validation-for="Sku" id="Sku-error" class="text-danger" aria-live="polite"></span>
+            </div>
+            <div class="col-md-8">
+                <label asp-for="Title" class="form-label"></label>
+                <input asp-for="Title" class="form-control" aria-describedby="Title-error" />
+                <span asp-validation-for="Title" id="Title-error" class="text-danger" aria-live="polite"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" aria-describedby="Description-error" rows="3"></textarea>
+                <span asp-validation-for="Description" id="Description-error" class="text-danger" aria-live="polite"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Price" class="form-label"></label>
+                <input asp-for="Price" class="form-control" aria-describedby="Price-error" type="number" step="0.01" inputmode="decimal" />
+                <span asp-validation-for="Price" id="Price-error" class="text-danger" aria-live="polite"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="StockQuantity" class="form-label"></label>
+                <input asp-for="StockQuantity" class="form-control" aria-describedby="StockQuantity-error" />
+                <span asp-validation-for="StockQuantity" id="StockQuantity-error" class="text-danger" aria-live="polite"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="ReorderThreshold" class="form-label"></label>
+                <input asp-for="ReorderThreshold" class="form-control" aria-describedby="ReorderThreshold-error" />
+                <span asp-validation-for="ReorderThreshold" id="ReorderThreshold-error" class="text-danger" aria-live="polite"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Status" class="form-label"></label>
+                <select asp-for="Status" class="form-select" aria-describedby="Status-error">
+                    <option>Active</option>
+                    <option>Recalled</option>
+                    <option>Discontinued</option>
+                </select>
+                <span asp-validation-for="Status" id="Status-error" class="text-danger" aria-live="polite"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="AgeRange" class="form-label"></label>
+                <input asp-for="AgeRange" class="form-control" aria-describedby="AgeRange-error" />
+                <span asp-validation-for="AgeRange" id="AgeRange-error" class="text-danger" aria-live="polite"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Category" class="form-label"></label>
+                <input asp-for="Category" class="form-control" aria-describedby="Category-error" />
+                <span asp-validation-for="Category" id="Category-error" class="text-danger" aria-live="polite"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Brand" class="form-label"></label>
+                <input asp-for="Brand" class="form-control" aria-describedby="Brand-error" />
+                <span asp-validation-for="Brand" id="Brand-error" class="text-danger" aria-live="polite"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="SafetyCertification" class="form-label"></label>
+                <input asp-for="SafetyCertification" class="form-control" aria-describedby="SafetyCertification-error" />
+                <span asp-validation-for="SafetyCertification" id="SafetyCertification-error" class="text-danger" aria-live="polite"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="SafetyNotes" class="form-label"></label>
+                <input asp-for="SafetyNotes" class="form-control" aria-describedby="SafetyNotes-error" />
+                <span asp-validation-for="SafetyNotes" id="SafetyNotes-error" class="text-danger" aria-live="polite"></span>
+            </div>
+            <div class="col-12">
+                <label class="form-check"><input asp-for="IsActive" class="form-check-input" /> Active listing</label>
+            </div>
+        </div>
+        <div class="mt-4">
+            <button class="btn btn-primary">Save toy</button>
+            <a class="btn btn-link" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

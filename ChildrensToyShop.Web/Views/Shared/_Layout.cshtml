@@ -22,11 +22,21 @@
                             <li class="nav-item"><a class="nav-link" asp-controller="Orders" asp-action="Index">Orders</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Reviews" asp-action="Index">Reviews</a></li>
                         }
-                        @if (User.IsInRole("Admin")) { <li class="nav-item"><a class="nav-link" asp-controller="Products" asp-action="Create">Add toy</a></li> }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Products" asp-action="Create">Add toy</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Products" asp-action="LowStock">Low Stock Alerts</a></li>
+                        }
                     </ul>
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <span class="navbar-text me-3">Hi, @User.Identity.Name</span>
+                        <div class="navbar-text me-3">
+                            <div>Hi, @User.Identity.Name</div>
+                            @if (User.IsInRole("Customer"))
+                            {
+                                @await Component.InvokeAsync("CouponBalance")
+                            }
+                        </div>
                         <form asp-controller="Auth" asp-action="Logout" method="post"><button class="btn btn-outline-light btn-sm">Sign out</button></form>
                     }
                     else { <a class="btn btn-light btn-sm" asp-controller="Auth" asp-action="Login">Sign in</a> }

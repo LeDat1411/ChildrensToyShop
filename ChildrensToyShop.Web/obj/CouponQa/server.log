@@ -1,0 +1,688 @@
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (17ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (60ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      
+      IF EXISTS
+          (SELECT *
+           FROM [sys].[objects] o
+           WHERE [o].[type] = 'U'
+           AND [o].[is_ms_shipped] = 0
+           AND [o].[object_id] NOT IN (SELECT [ep].[major_id]
+              FROM [sys].[extended_properties] AS [ep]
+              WHERE [ep].[minor_id] = 0
+                  AND [ep].[class] = 1
+                  AND [ep].[name] = N'microsoft_database_tools_support'
+          )
+      )
+      SELECT 1 ELSE SELECT 0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [Users] AS [u]) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [Products] AS [p]) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:53837
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\Admin\source\repos\ChildrensToyShop.Web
+warn: Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware[3]
+      Failed to determine the https port for redirect.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (12ms) [Parameters=[@ToLower='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [u].[Id], [u].[CreatedAt], [u].[DisplayName], [u].[Email], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE [u].[Email] = @ToLower
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (11ms) [Parameters=[@p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [p].[Id], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+      FROM [Products] AS [p]
+      WHERE [p].[IsActive] = CAST(1 AS bit) AND [p].[Status] = N'Active'
+      ORDER BY [p].[StockQuantity] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [p].[Id], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+      FROM [Products] AS [p]
+      WHERE [p].[IsActive] = CAST(1 AS bit) AND [p].[Status] <> N'Discontinued' AND [p].[StockQuantity] < [p].[ReorderThreshold]
+      ORDER BY [p].[ReorderThreshold] - [p].[StockQuantity] DESC, [p].[Title]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@product_Sku='?' (Size = 40), @product_Id='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [Products] AS [p]
+              WHERE [p].[Sku] = @product_Sku AND [p].[Id] <> @product_Id) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@product_Sku='?' (Size = 40), @product_Id='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [Products] AS [p]
+              WHERE [p].[Sku] = @product_Sku AND [p].[Id] <> @product_Id) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@p0='?' (Size = 40), @p1='?' (Size = 60), @p2='?' (Size = 60), @p3='?' (DbType = DateTime2), @p4='?' (Size = 2000), @p5='?' (DbType = Boolean), @p6='?' (Precision = 18) (Scale = 2) (DbType = Decimal), @p7='?' (DbType = Int32), @p8='?' (Size = 100), @p9='?' (Size = 240), @p10='?' (Size = 40), @p11='?' (Size = 20), @p12='?' (DbType = Int32), @p13='?' (Size = 140)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [Products] ([AgeRange], [Brand], [Category], [CreatedAt], [Description], [IsActive], [Price], [ReorderThreshold], [SafetyCertification], [SafetyNotes], [Sku], [Status], [StockQuantity], [Title])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [p].[Id], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+      FROM [Products] AS [p]
+      WHERE [p].[IsActive] = CAST(1 AS bit)
+      ORDER BY [p].[Title]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [p0].[Category]
+      FROM (
+          SELECT DISTINCT [p].[Category]
+          FROM [Products] AS [p]
+          WHERE [p].[IsActive] = CAST(1 AS bit)
+      ) AS [p0]
+      ORDER BY [p0].[Category]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [p0].[AgeRange]
+      FROM (
+          SELECT DISTINCT [p].[AgeRange]
+          FROM [Products] AS [p]
+          WHERE [p].[IsActive] = CAST(1 AS bit)
+      ) AS [p0]
+      ORDER BY [p0].[AgeRange]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [p0].[Brand]
+      FROM (
+          SELECT DISTINCT [p].[Brand]
+          FROM [Products] AS [p]
+          WHERE [p].[IsActive] = CAST(1 AS bit)
+      ) AS [p0]
+      ORDER BY [p0].[Brand]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [p].[Id], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+      FROM [Products] AS [p]
+      WHERE [p].[IsActive] = CAST(1 AS bit) AND [p].[Status] <> N'Discontinued' AND [p].[StockQuantity] < [p].[ReorderThreshold]
+      ORDER BY [p].[ReorderThreshold] - [p].[StockQuantity] DESC, [p].[Title]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@ToLower='?' (Size = 200)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [u].[Id], [u].[CreatedAt], [u].[DisplayName], [u].[Email], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE [u].[Email] = @ToLower
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [p].[Id], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+      FROM [Products] AS [p]
+      WHERE [p].[IsActive] = CAST(1 AS bit) AND [p].[Status] = N'Active'
+      ORDER BY [p].[StockQuantity] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (16ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [p0].[Id], [p0].[AgeRange], [p0].[Brand], [p0].[Category], [p0].[CreatedAt], [p0].[Description], [p0].[IsActive], [p0].[Price], [p0].[ReorderThreshold], [p0].[SafetyCertification], [p0].[SafetyNotes], [p0].[Sku], [p0].[Status], [p0].[StockQuantity], [p0].[Title], [s].[Id], [s].[ActualAgeSuitability], [s].[Comment], [s].[CreatedAt], [s].[ProductId], [s].[Rating], [s].[UpdatedAt], [s].[UserId], [s].[VisibilityStatus], [s].[Id0], [s].[CreatedAt0], [s].[DisplayName], [s].[Email], [s].[PasswordHash], [s].[Role]
+      FROM (
+          SELECT TOP(2) [p].[Id], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [Products] AS [p]
+          WHERE [p].[Id] = @id AND [p].[IsActive] = CAST(1 AS bit)
+      ) AS [p0]
+      LEFT JOIN (
+          SELECT [r].[Id], [r].[ActualAgeSuitability], [r].[Comment], [r].[CreatedAt], [r].[ProductId], [r].[Rating], [r].[UpdatedAt], [r].[UserId], [r].[VisibilityStatus], [u].[Id] AS [Id0], [u].[CreatedAt] AS [CreatedAt0], [u].[DisplayName], [u].[Email], [u].[PasswordHash], [u].[Role]
+          FROM [Reviews] AS [r]
+          INNER JOIN [Users] AS [u] ON [r].[UserId] = [u].[Id]
+      ) AS [s] ON [p0].[Id] = [s].[ProductId]
+      ORDER BY [p0].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@p='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [p].[Id], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+      FROM [Products] AS [p]
+      WHERE [p].[Id] = @p
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (18ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@p0='?' (Size = 1), @p1='?' (DbType = DateTime2), @p2='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [Carts] ([CouponCode], [UpdatedAt], [UserId])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (12ms) [Parameters=[@p0='?' (DbType = Int32), @p1='?' (DbType = Boolean), @p2='?' (DbType = Int32), @p3='?' (DbType = Int32), @p5='?' (DbType = Int32), @p4='?' (DbType = DateTime2), @p6='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET NOCOUNT ON;
+      INSERT INTO [CartItems] ([CartId], [GiftWrap], [ProductId], [Quantity])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2, @p3);
+      UPDATE [Carts] SET [UpdatedAt] = @p4
+      OUTPUT 1
+      WHERE [Id] = @p5 AND [UpdatedAt] = @p6;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (19ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@cart_UserId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @cart_UserId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@cart_UserId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @cart_UserId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@cart_UserId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @cart_UserId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[@_8__locals1_cart_UserId='?' (DbType = Int32), @coupon_Code='?' (Size = 1)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [CustomerCoupons] AS [c]
+              WHERE [c].[UserId] = @_8__locals1_cart_UserId AND [c].[Code] = @coupon_Code AND [c].[Quantity] > 0) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@p2='?' (DbType = Int32), @p0='?' (Size = 1), @p1='?' (DbType = DateTime2), @p3='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [Carts] SET [CouponCode] = @p0, [UpdatedAt] = @p1
+      OUTPUT 1
+      WHERE [Id] = @p2 AND [UpdatedAt] = @p3;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@cart_UserId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @cart_UserId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@_8__locals1_cart_UserId='?' (DbType = Int32), @coupon_Code='?' (Size = 1)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [CustomerCoupons] AS [c]
+              WHERE [c].[UserId] = @_8__locals1_cart_UserId AND [c].[Code] = @coupon_Code AND [c].[Quantity] > 0) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p2='?' (DbType = Int32), @p0='?' (Size = 1), @p1='?' (DbType = DateTime2), @p3='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [Carts] SET [CouponCode] = @p0, [UpdatedAt] = @p1
+      OUTPUT 1
+      WHERE [Id] = @p2 AND [UpdatedAt] = @p3;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@cart_UserId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @cart_UserId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@_8__locals1_cart_UserId='?' (DbType = Int32), @coupon_Code='?' (Size = 1)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [CustomerCoupons] AS [c]
+              WHERE [c].[UserId] = @_8__locals1_cart_UserId AND [c].[Code] = @coupon_Code AND [c].[Quantity] > 0) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p2='?' (DbType = Int32), @p0='?' (Size = 1), @p1='?' (DbType = DateTime2), @p3='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [Carts] SET [CouponCode] = @p0, [UpdatedAt] = @p1
+      OUTPUT 1
+      WHERE [Id] = @p2 AND [UpdatedAt] = @p3;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@cart_UserId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @cart_UserId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p2='?' (DbType = Int32), @p0='?' (Size = 1), @p1='?' (DbType = DateTime2), @p3='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [Carts] SET [CouponCode] = @p0, [UpdatedAt] = @p1
+      OUTPUT 1
+      WHERE [Id] = @p2 AND [UpdatedAt] = @p3;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@cart_UserId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @cart_UserId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@_8__locals1_cart_UserId='?' (DbType = Int32), @coupon_Code='?' (Size = 1)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [CustomerCoupons] AS [c]
+              WHERE [c].[UserId] = @_8__locals1_cart_UserId AND [c].[Code] = @coupon_Code AND [c].[Quantity] > 0) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p2='?' (DbType = Int32), @p0='?' (Size = 1), @p1='?' (DbType = DateTime2), @p3='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [Carts] SET [CouponCode] = @p0, [UpdatedAt] = @p1
+      OUTPUT 1
+      WHERE [Id] = @p2 AND [UpdatedAt] = @p3;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @userId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@cart_UserId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @cart_UserId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (14ms) [Parameters=[@CurrentUserId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @CurrentUserId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@CurrentUserId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c1].[Id], [c1].[CouponCode], [c1].[UpdatedAt], [c1].[UserId], [s].[Id], [s].[CartId], [s].[GiftWrap], [s].[ProductId], [s].[Quantity], [s].[Id0], [s].[AgeRange], [s].[Brand], [s].[Category], [s].[CreatedAt], [s].[Description], [s].[IsActive], [s].[Price], [s].[ReorderThreshold], [s].[SafetyCertification], [s].[SafetyNotes], [s].[Sku], [s].[Status], [s].[StockQuantity], [s].[Title]
+      FROM (
+          SELECT TOP(2) [c].[Id], [c].[CouponCode], [c].[UpdatedAt], [c].[UserId]
+          FROM [Carts] AS [c]
+          WHERE [c].[UserId] = @CurrentUserId
+      ) AS [c1]
+      LEFT JOIN (
+          SELECT [c0].[Id], [c0].[CartId], [c0].[GiftWrap], [c0].[ProductId], [c0].[Quantity], [p].[Id] AS [Id0], [p].[AgeRange], [p].[Brand], [p].[Category], [p].[CreatedAt], [p].[Description], [p].[IsActive], [p].[Price], [p].[ReorderThreshold], [p].[SafetyCertification], [p].[SafetyNotes], [p].[Sku], [p].[Status], [p].[StockQuantity], [p].[Title]
+          FROM [CartItems] AS [c0]
+          INNER JOIN [Products] AS [p] ON [c0].[ProductId] = [p].[Id]
+      ) AS [s] ON [c1].[Id] = [s].[CartId]
+      ORDER BY [c1].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (10ms) [Parameters=[@line_Quantity='?' (DbType = Int32), @product_Id='?' (DbType = Int32), @_8__locals1_line_Quantity='?' (DbType = Int32), @product_Price='?' (Precision = 18) (Scale = 2) (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      UPDATE [p]
+      SET [p].[StockQuantity] = [p].[StockQuantity] - @line_Quantity
+      FROM [Products] AS [p]
+      WHERE [p].[Id] = @product_Id AND [p].[IsActive] = CAST(1 AS bit) AND [p].[Status] = N'Active' AND [p].[StockQuantity] >= @_8__locals1_line_Quantity AND [p].[Price] = @product_Price
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@order_UserId='?' (DbType = Int32), @coupon_Code='?' (Size = 1)], CommandType='Text', CommandTimeout='30']
+      UPDATE [c]
+      SET [c].[Quantity] = [c].[Quantity] - 1
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @order_UserId AND [c].[Code] = @coupon_Code AND [c].[Quantity] > 0
+warn: Microsoft.EntityFrameworkCore.Database.Transaction[30004]
+      Savepoints are disabled because Multiple Active Result Sets (MARS) is enabled. If 'SaveChanges' fails, then the transaction cannot be automatically rolled back to a known clean state. Instead, the transaction should be rolled back by the application before retrying 'SaveChanges'. See https://go.microsoft.com/fwlink/?linkid=2149338 for more information and examples. To identify the code which triggers this warning, call 'ConfigureWarnings(w => w.Throw(SqlServerEventId.SavepointsDisabledBecauseOfMARS))'.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (11ms) [Parameters=[@p0='?' (DbType = Int32), @p3='?' (DbType = Int32), @p1='?' (Size = 1), @p2='?' (DbType = DateTime2), @p4='?' (DbType = DateTime2), @p5='?' (Size = 1), @p6='?' (DbType = DateTime2), @p7='?' (Precision = 18) (Scale = 2) (DbType = Decimal), @p8='?' (Precision = 18) (Scale = 2) (DbType = Decimal), @p9='?' (DbType = Boolean), @p10='?' (Size = 30), @p11='?' (Size = 300), @p12='?' (Size = 20), @p13='?' (Precision = 18) (Scale = 2) (DbType = Decimal), @p14='?' (Precision = 18) (Scale = 2) (DbType = Decimal), @p15='?' (Precision = 18) (Scale = 2) (DbType = Decimal), @p16='?' (Size = 80), @p17='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SET NOCOUNT ON;
+      DELETE FROM [CartItems]
+      OUTPUT 1
+      WHERE [Id] = @p0;
+      UPDATE [Carts] SET [CouponCode] = @p1, [UpdatedAt] = @p2
+      OUTPUT 1
+      WHERE [Id] = @p3 AND [UpdatedAt] = @p4;
+      INSERT INTO [Orders] ([CouponCode], [CreatedAt], [DiscountAmount], [GiftWrapFee], [IsArchived], [OrderNumber], [ShippingAddress], [Status], [Subtotal], [Tax], [Total], [TrackingNumber], [UserId])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[@p18='?' (DbType = Boolean), @p19='?' (DbType = Int32), @p20='?' (DbType = Int32), @p21='?' (Size = 140), @p22='?' (DbType = Int32), @p23='?' (Size = 40), @p24='?' (Precision = 18) (Scale = 2) (DbType = Decimal)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [OrderItems] ([GiftWrap], [OrderId], [ProductId], [ProductTitle], [Quantity], [Sku], [UnitPrice])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p18, @p19, @p20, @p21, @p22, @p23, @p24);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (16ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[Id], [s].[CouponCode], [s].[CreatedAt], [s].[DiscountAmount], [s].[GiftWrapFee], [s].[IsArchived], [s].[OrderNumber], [s].[ShippingAddress], [s].[Status], [s].[Subtotal], [s].[Tax], [s].[Total], [s].[TrackingNumber], [s].[UserId], [s].[Id0], [s].[CreatedAt0], [s].[DisplayName], [s].[Email], [s].[PasswordHash], [s].[Role], [o0].[Id], [o0].[GiftWrap], [o0].[OrderId], [o0].[ProductId], [o0].[ProductTitle], [o0].[Quantity], [o0].[Sku], [o0].[UnitPrice]
+      FROM (
+          SELECT TOP(2) [o].[Id], [o].[CouponCode], [o].[CreatedAt], [o].[DiscountAmount], [o].[GiftWrapFee], [o].[IsArchived], [o].[OrderNumber], [o].[ShippingAddress], [o].[Status], [o].[Subtotal], [o].[Tax], [o].[Total], [o].[TrackingNumber], [o].[UserId], [u].[Id] AS [Id0], [u].[CreatedAt] AS [CreatedAt0], [u].[DisplayName], [u].[Email], [u].[PasswordHash], [u].[Role]
+          FROM [Orders] AS [o]
+          INNER JOIN [Users] AS [u] ON [o].[UserId] = [u].[Id]
+          WHERE [o].[Id] = @id
+      ) AS [s]
+      LEFT JOIN [OrderItems] AS [o0] ON [s].[Id] = [o0].[OrderId]
+      ORDER BY [s].[Id], [s].[Id0]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[Id], [s].[CouponCode], [s].[CreatedAt], [s].[DiscountAmount], [s].[GiftWrapFee], [s].[IsArchived], [s].[OrderNumber], [s].[ShippingAddress], [s].[Status], [s].[Subtotal], [s].[Tax], [s].[Total], [s].[TrackingNumber], [s].[UserId], [s].[Id0], [s].[CreatedAt0], [s].[DisplayName], [s].[Email], [s].[PasswordHash], [s].[Role], [o0].[Id], [o0].[GiftWrap], [o0].[OrderId], [o0].[ProductId], [o0].[ProductTitle], [o0].[Quantity], [o0].[Sku], [o0].[UnitPrice]
+      FROM (
+          SELECT TOP(2) [o].[Id], [o].[CouponCode], [o].[CreatedAt], [o].[DiscountAmount], [o].[GiftWrapFee], [o].[IsArchived], [o].[OrderNumber], [o].[ShippingAddress], [o].[Status], [o].[Subtotal], [o].[Tax], [o].[Total], [o].[TrackingNumber], [o].[UserId], [u].[Id] AS [Id0], [u].[CreatedAt] AS [CreatedAt0], [u].[DisplayName], [u].[Email], [u].[PasswordHash], [u].[Role]
+          FROM [Orders] AS [o]
+          INNER JOIN [Users] AS [u] ON [o].[UserId] = [u].[Id]
+          WHERE [o].[Id] = @id
+      ) AS [s]
+      LEFT JOIN [OrderItems] AS [o0] ON [s].[Id] = [o0].[OrderId]
+      ORDER BY [s].[Id], [s].[Id0]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [o1].[Id], [o1].[CouponCode], [o1].[CreatedAt], [o1].[DiscountAmount], [o1].[GiftWrapFee], [o1].[IsArchived], [o1].[OrderNumber], [o1].[ShippingAddress], [o1].[Status], [o1].[Subtotal], [o1].[Tax], [o1].[Total], [o1].[TrackingNumber], [o1].[UserId], [o0].[Id], [o0].[GiftWrap], [o0].[OrderId], [o0].[ProductId], [o0].[ProductTitle], [o0].[Quantity], [o0].[Sku], [o0].[UnitPrice]
+      FROM (
+          SELECT TOP(2) [o].[Id], [o].[CouponCode], [o].[CreatedAt], [o].[DiscountAmount], [o].[GiftWrapFee], [o].[IsArchived], [o].[OrderNumber], [o].[ShippingAddress], [o].[Status], [o].[Subtotal], [o].[Tax], [o].[Total], [o].[TrackingNumber], [o].[UserId]
+          FROM [Orders] AS [o]
+          WHERE [o].[Id] = @id
+      ) AS [o1]
+      LEFT JOIN [OrderItems] AS [o0] ON [o1].[Id] = [o0].[OrderId]
+      ORDER BY [o1].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@p='?' (Size = 20), @p2='?' (DbType = Boolean), @id='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      UPDATE [o]
+      SET [o].[Status] = @p,
+          [o].[IsArchived] = @p2
+      FROM [Orders] AS [o]
+      WHERE [o].[Id] = @id AND [o].[Status] IN (N'PAID', N'PROCESSING')
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@item_Quantity='?' (DbType = Int32), @item_ProductId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      UPDATE [p]
+      SET [p].[StockQuantity] = [p].[StockQuantity] + @item_Quantity
+      FROM [Products] AS [p]
+      WHERE [p].[Id] = @item_ProductId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@order_UserId='?' (DbType = Int32), @order_CouponCode='?' (Size = 1)], CommandType='Text', CommandTimeout='30']
+      UPDATE [c]
+      SET [c].[Quantity] = [c].[Quantity] + 1
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @order_UserId AND [c].[Code] = @order_CouponCode
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (14ms) [Parameters=[@CurrentUserId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [o].[Id], [o].[CouponCode], [o].[CreatedAt], [o].[DiscountAmount], [o].[GiftWrapFee], [o].[IsArchived], [o].[OrderNumber], [o].[ShippingAddress], [o].[Status], [o].[Subtotal], [o].[Tax], [o].[Total], [o].[TrackingNumber], [o].[UserId], [u].[Id], [u].[CreatedAt], [u].[DisplayName], [u].[Email], [u].[PasswordHash], [u].[Role], [o0].[Id], [o0].[GiftWrap], [o0].[OrderId], [o0].[ProductId], [o0].[ProductTitle], [o0].[Quantity], [o0].[Sku], [o0].[UnitPrice]
+      FROM [Orders] AS [o]
+      INNER JOIN [Users] AS [u] ON [o].[UserId] = [u].[Id]
+      LEFT JOIN [OrderItems] AS [o0] ON [o].[Id] = [o0].[OrderId]
+      WHERE [o].[IsArchived] = CAST(0 AS bit) AND [o].[UserId] = @CurrentUserId
+      ORDER BY [o].[CreatedAt] DESC, [o].[Id], [u].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[UserId], [c].[Code], [c].[Quantity]
+      FROM [CustomerCoupons] AS [c]
+      WHERE [c].[UserId] = @userId

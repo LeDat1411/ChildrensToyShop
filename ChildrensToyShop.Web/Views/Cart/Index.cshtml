@@ -1,4 +1,69 @@
 @model CartViewModel
 @{ ViewData["Title"] = "My cart"; }
-<div class="section-heading"><div><p class="eyebrow">Almost yours</p><h1>My cart</h1></div>@if(Model.Cart.Items.Any()){<form asp-action="Clear" method="post"><button class="btn btn-link text-danger">Clear cart</button></form>}</div>
-@if(!Model.Cart.Items.Any()){<div class="empty-state"><h2>Your cart is ready for something fun.</h2><a class="btn btn-primary" asp-controller="Products" asp-action="Index">Shop toys</a></div>}else{<div class="cart-layout"><div>@foreach(var item in Model.Cart.Items){<article class="cart-item"><div class="product-mark">@item.Product?.Category?.Substring(0,1)</div><div class="flex-grow-1"><h3>@item.Product?.Title</h3><p class="text-muted mb-2">$@item.Product?.Price.ToString("0.00") each · @item.Product?.StockQuantity in stock</p><form asp-action="Update" method="post" class="cart-controls"><input type="hidden" name="itemId" value="@item.Id" /><label>Qty <input class="form-control form-control-sm" type="number" name="quantity" value="@item.Quantity" min="0" max="99" /></label><label><input type="checkbox" name="giftWrap" value="true" checked="@item.GiftWrap" /> Gift wrap ($2.50 each)</label><button class="btn btn-sm btn-outline-primary">Update</button></form></div><form asp-action="Remove" method="post"><input type="hidden" name="itemId" value="@item.Id" /><button class="btn btn-sm btn-link text-danger">Remove</button></form></article>}</div><aside class="summary-card"><h2>Order summary</h2><dl><dt>Subtotal</dt><dd>$@Model.Subtotal.ToString("0.00")</dd><dt>Gift wrap</dt><dd>$@Model.GiftWrapFee.ToString("0.00")</dd><dt>Estimated tax</dt><dd>$@Model.Tax.ToString("0.00")</dd><dt class="total">Total</dt><dd class="total">$@Model.Total.ToString("0.00")</dd></dl><a class="btn btn-primary w-100" asp-controller="Orders" asp-action="Checkout">Checkout</a></aside></div>}
+
+<div class="section-heading">
+    <h1>My cart</h1>
+    @if (Model.Cart.Items.Any())
+    {
+        <form asp-action="Clear" method="post"><button class="btn btn-link text-danger">Clear cart</button></form>
+    }
+</div>
+
+@if (!Model.Cart.Items.Any())
+{
+    <div class="empty-state">
+        <h2>Your cart is empty</h2>
+        <a class="btn btn-primary" asp-controller="Products" asp-action="Index">Shop toys</a>
+    </div>
+}
+else
+{
+    <div class="cart-layout">
+        <div>
+            @foreach (var item in Model.Cart.Items)
+            {
+                <article class="cart-item">
+                    <div class="product-mark">@item.Product?.Category?.Substring(0, 1)</div>
+                    <div class="flex-grow-1">
+                        <h3>@item.Product?.Title</h3>
+                        <p class="text-muted mb-2">$@item.Product?.Price.ToString("0.00") each · @item.Product?.StockQuantity in stock</p>
+                        <form asp-action="Update" method="post" class="cart-controls">
+                            <input type="hidden" name="itemId" value="@item.Id" />
+                            <label>Qty <input class="form-control form-control-sm" type="number" name="quantity" value="@item.Quantity" min="0" max="99" /></label>
+                            <label><input type="checkbox" name="giftWrap" value="true" checked="@item.GiftWrap" /> Gift wrap ($2.50 each)</label>
+                            <button class="btn btn-sm btn-outline-primary">Update</button>
+                        </form>
+                    </div>
+                    <form asp-action="Remove" method="post">
+                        <input type="hidden" name="itemId" value="@item.Id" />
+                        <button class="btn btn-sm btn-link text-danger">Remove</button>
+                    </form>
+                </article>
+            }
+        </div>
+        <aside class="summary-card">
+            <h2>Order summary</h2>
+            @if (User.IsInRole("Customer"))
+            {
+                <form asp-action="ApplyCoupon" method="post" class="mb-3">
+                    <label for="couponCode" class="form-label">Discount coupon</label>
+                    <select name="couponCode" id="couponCode" class="form-select" aria-describedby="coupon-help">
+                        <option value="">No coupon</option>
+                        @foreach (var coupon in CouponType.All)
+                        {
+                            var quantity = Model.Coupons.FirstOrDefault(x => x.Code == coupon.Code)?.Quantity ?? 0;
+                            var applied = Model.AppliedCoupon?.Code == coupon.Code;
+                            <option value="@coupon.Code" selected="@applied" disabled="@(quantity == 0 && !applied)">
+                                @coupon.Code · @coupon.Percent% off (@quantity.ToString("N0") available)
+                            </option>
+                        }
+                    </select>
+                    <p class="form-text mb-2" id="coupon-help">One coupon per order. Select “No coupon” and apply it to remove a discount.</p>
+                    <button class="btn btn-outline-primary btn-sm">Apply selection</button>
+                </form>
+            }
+            <partial name="_CartTotals" model="Model" />
+            <a class="btn btn-primary w-100" asp-controller="Orders" asp-action="Checkout">Checkout</a>
+        </aside>
+    </div>
+}

@@ -17,7 +17,44 @@ public class CartController(ApplicationDbContext db) : Controller
         cart = new ShoppingCart { UserId = userId }; db.Carts.Add(cart); await db.SaveChangesAsync(); return cart;
     }
 
-    public async Task<IActionResult> Index() => View(new CartViewModel { Cart = await CurrentCartAsync() });
+    public async Task<IActionResult> Index()
+    {
+        var cart = await CurrentCartAsync();
+        var coupons = User.IsInRole("Customer")
+            ? await db.CustomerCoupons.AsNoTracking().Where(x => x.UserId == cart.UserId).ToListAsync()
+            : [];
+        return View(new CartViewModel { Cart = cart, Coupons = coupons });
+    }
+
+    [Authorize(Roles = "Customer"), HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ApplyCoupon(string? couponCode)
+    {
+        var cart = await CurrentCartAsync();
+        if (cart.Items.Count == 0) return RedirectToAction(nameof(Index));
+
+        if (!string.IsNullOrWhiteSpace(couponCode))
+        {
+            var coupon = CouponType.Find(couponCode.Trim().ToUpperInvariant());
+            if (coupon is null || !await db.CustomerCoupons.AnyAsync(x =>
+                x.UserId == cart.UserId && x.Code == coupon.Code && x.Quantity > 0))
+            {
+                TempData["Error"] = "That coupon is unavailable in your account.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            cart.CouponCode = coupon.Code;
+            TempData["Success"] = $"Coupon {coupon.Code} applied for {coupon.Percent}% off.";
+        }
+        else
+        {
+            cart.CouponCode = null;
+            TempData["Success"] = "Coupon removed from your cart.";
+        }
+
+        cart.UpdatedAt = DateTime.UtcNow;
+        await SaveCartAsync();
+        return RedirectToAction(nameof(Index));
+    }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Add(int productId, string? returnUrl)
@@ -27,29 +64,60 @@ public class CartController(ApplicationDbContext db) : Controller
         var cart = await CurrentCartAsync(); var line = cart.Items.SingleOrDefault(x => x.ProductId == productId);
         if ((line?.Quantity ?? 0) >= product.StockQuantity) { TempData["Error"] = "There is not enough available stock for that quantity."; return Redirect(returnUrl ?? "/Products"); }
         if (line is null) db.CartItems.Add(new CartItem { CartId = cart.Id, ProductId = productId }); else line.Quantity++;
-        cart.UpdatedAt = DateTime.UtcNow; await db.SaveChangesAsync(); TempData["Success"] = "Toy added to your cart."; return Redirect(returnUrl ?? "/Cart");
+        cart.UpdatedAt = DateTime.UtcNow;
+        TempData["Success"] = "Toy added to your cart.";
+        await SaveCartAsync();
+        return Redirect(returnUrl ?? "/Cart");
     }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Update(int itemId, int quantity, bool giftWrap)
     {
         var cart = await CurrentCartAsync(); var item = cart.Items.SingleOrDefault(x => x.Id == itemId); if (item is null) return NotFound();
-        if (quantity <= 0) db.CartItems.Remove(item);
+        if (quantity <= 0) RemoveLine(cart, item);
         else if (item.Product is not null && quantity > item.Product.StockQuantity) TempData["Error"] = "Quantity exceeds current stock.";
         else { item.Quantity = quantity; item.GiftWrap = giftWrap; cart.UpdatedAt = DateTime.UtcNow; }
-        await db.SaveChangesAsync(); return RedirectToAction(nameof(Index));
+        await SaveCartAsync(); return RedirectToAction(nameof(Index));
     }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Remove(int itemId)
     {
-        var cart = await CurrentCartAsync(); var item = cart.Items.SingleOrDefault(x => x.Id == itemId); if (item is not null) db.CartItems.Remove(item);
-        await db.SaveChangesAsync(); TempData["Success"] = "Item removed from your cart."; return RedirectToAction(nameof(Index));
+        var cart = await CurrentCartAsync(); var item = cart.Items.SingleOrDefault(x => x.Id == itemId); if (item is not null) RemoveLine(cart, item);
+        TempData["Success"] = "Item removed from your cart.";
+        await SaveCartAsync();
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Clear()
     {
-        var cart = await CurrentCartAsync(); db.CartItems.RemoveRange(cart.Items); await db.SaveChangesAsync(); TempData["Success"] = "Your cart is now empty."; return RedirectToAction(nameof(Index));
+        var cart = await CurrentCartAsync();
+        cart.CouponCode = null;
+        cart.UpdatedAt = DateTime.UtcNow;
+        db.CartItems.RemoveRange(cart.Items);
+        TempData["Success"] = "Your cart is now empty.";
+        await SaveCartAsync();
+        return RedirectToAction(nameof(Index));
+    }
+
+    private void RemoveLine(ShoppingCart cart, CartItem item)
+    {
+        if (cart.Items.Count == 1) cart.CouponCode = null;
+        cart.UpdatedAt = DateTime.UtcNow;
+        db.CartItems.Remove(item);
+    }
+
+    private async Task SaveCartAsync()
+    {
+        try
+        {
+            await db.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            TempData.Remove("Success");
+            TempData["Error"] = "Your cart changed in another request. Review it and try again.";
+        }
     }
 }

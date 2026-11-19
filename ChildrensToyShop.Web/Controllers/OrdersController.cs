@@ -33,20 +33,89 @@ public class OrdersController(ApplicationDbContext db) : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Checkout(CheckoutViewModel model)
     {
-        var cart = await CartAsync(); model.Cart = new CartViewModel { Cart = cart ?? new ShoppingCart() };
-        if (cart is null || cart.Items.Count == 0) { ModelState.AddModelError(string.Empty, "Your cart is empty."); return View(model); }
-        foreach (var line in cart.Items)
-            if (line.Product is null || !line.Product.IsActive || line.Product.Status != ProductStatus.Active || line.Quantity > line.Product.StockQuantity) ModelState.AddModelError(string.Empty, $"{line.Product?.Title ?? "An item"} is no longer available in the requested quantity.");
-        if (!ModelState.IsValid) return View(model);
-        var totals = model.Cart;
-        var order = new Order { UserId = User.CurrentUserId(), OrderNumber = $"TOY-{DateTime.UtcNow:yyyyMMddHHmmss}-{Random.Shared.Next(100, 999)}", ShippingAddress = model.ShippingAddress, Status = OrderStatus.Paid, Subtotal = totals.Subtotal, Tax = totals.Tax, GiftWrapFee = totals.GiftWrapFee, Total = totals.Total };
+        var cart = await CartAsync();
+        if (cart is null || cart.Items.Count == 0)
+        {
+            TempData["Error"] = "Your cart is empty.";
+            return RedirectToAction("Index", "Cart");
+        }
+
+        model.Cart = new CartViewModel { Cart = cart };
+        if (cart.CouponCode != model.ExpectedCouponCode)
+            ModelState.AddModelError(string.Empty, "Your coupon selection changed. Review the total before placing your order.");
+
         foreach (var line in cart.Items)
         {
-            var p = line.Product!; p.StockQuantity -= line.Quantity;
-            order.Items.Add(new OrderItem { ProductId = p.Id, ProductTitle = p.Title, Sku = p.Sku, UnitPrice = p.Price, Quantity = line.Quantity, GiftWrap = line.GiftWrap });
+            if (line.Product is null || !line.Product.IsActive || line.Product.Status != ProductStatus.Active || line.Quantity > line.Product.StockQuantity)
+                ModelState.AddModelError(string.Empty, $"{line.Product?.Title ?? "An item"} is no longer available in the requested quantity.");
         }
-        db.Orders.Add(order); db.CartItems.RemoveRange(cart.Items); await db.SaveChangesAsync();
-        TempData["Success"] = "Payment simulation accepted. Your order is now PAID."; return RedirectToAction(nameof(Details), new { id = order.Id });
+        if (!ModelState.IsValid) return View(model);
+
+        var totals = model.Cart;
+        var coupon = totals.AppliedCoupon;
+        var order = new Order
+        {
+            UserId = cart.UserId,
+            OrderNumber = $"TOY-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid().ToString("N")[..10]}",
+            ShippingAddress = model.ShippingAddress,
+            Status = OrderStatus.Paid,
+            Subtotal = totals.Subtotal,
+            Tax = totals.Tax,
+            GiftWrapFee = totals.GiftWrapFee,
+            CouponCode = coupon?.Code,
+            DiscountAmount = totals.DiscountAmount,
+            Total = totals.Total
+        };
+
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        foreach (var line in cart.Items.OrderBy(x => x.ProductId))
+        {
+            var product = line.Product!;
+            var updated = await db.Products.Where(x => x.Id == product.Id && x.IsActive &&
+                    x.Status == ProductStatus.Active && x.StockQuantity >= line.Quantity && x.Price == product.Price)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.StockQuantity, x => x.StockQuantity - line.Quantity));
+            if (updated == 0)
+            {
+                TempData["Error"] = $"{product.Title} changed while you were checking out. Review your cart and try again.";
+                return RedirectToAction("Index", "Cart");
+            }
+
+            order.Items.Add(new OrderItem
+            {
+                ProductId = product.Id, ProductTitle = product.Title, Sku = product.Sku,
+                UnitPrice = product.Price, Quantity = line.Quantity, GiftWrap = line.GiftWrap
+            });
+        }
+
+        if (coupon is not null)
+        {
+            var redeemed = await db.CustomerCoupons.Where(x =>
+                    x.UserId == order.UserId && x.Code == coupon.Code && x.Quantity > 0)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.Quantity, x => x.Quantity - 1));
+            if (redeemed == 0)
+            {
+                TempData["Error"] = $"Coupon {coupon.Code} is unavailable. Change or remove it in My Cart.";
+                return RedirectToAction("Index", "Cart");
+            }
+        }
+
+        cart.CouponCode = null;
+        cart.UpdatedAt = DateTime.UtcNow;
+        db.Orders.Add(order);
+        db.CartItems.RemoveRange(cart.Items);
+        try
+        {
+            await db.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            TempData["Error"] = "Your cart changed during checkout. Review it before placing your order.";
+            return RedirectToAction("Index", "Cart");
+        }
+
+        TempData["Success"] = "Payment simulation accepted. Your order is now PAID.";
+        return RedirectToAction(nameof(Details), new { id = order.Id });
     }
 
     [Authorize(Roles = "Admin"), HttpPost, ValidateAntiForgeryToken]
@@ -54,8 +123,14 @@ public class OrdersController(ApplicationDbContext db) : Controller
     {
         var order = await db.Orders.FindAsync(id); if (order is null) return NotFound();
         var allowed = new[] { OrderStatus.Paid, OrderStatus.Processing, OrderStatus.Shipped, OrderStatus.Delivered };
-        if (!allowed.Contains(status)) { TempData["Error"] = "Invalid fulfillment status."; return RedirectToAction(nameof(Details), new { id }); }
-        order.Status = status; if (!string.IsNullOrWhiteSpace(trackingNumber)) order.TrackingNumber = trackingNumber.Trim(); await db.SaveChangesAsync(); TempData["Success"] = "Order fulfillment updated."; return RedirectToAction(nameof(Details), new { id });
+        if (!allowed.Contains(status) || order.Status == OrderStatus.Cancelled) { TempData["Error"] = "Invalid fulfillment status."; return RedirectToAction(nameof(Details), new { id }); }
+        var tracking = string.IsNullOrWhiteSpace(trackingNumber) ? order.TrackingNumber : trackingNumber.Trim();
+        var updated = await db.Orders.Where(x => x.Id == id && x.Status == order.Status)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.Status, status)
+                .SetProperty(x => x.TrackingNumber, tracking));
+        if (updated == 0) TempData["Error"] = "The order changed. Review its current status.";
+        else TempData["Success"] = "Order fulfillment updated.";
+        return RedirectToAction(nameof(Details), new { id });
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -63,8 +138,33 @@ public class OrdersController(ApplicationDbContext db) : Controller
     {
         var order = await db.Orders.Include(x => x.Items).SingleOrDefaultAsync(x => x.Id == id);
         if (order is null || (!User.IsAdmin() && order.UserId != User.CurrentUserId())) return NotFound();
-        if (order.Status is OrderStatus.Shipped or OrderStatus.Delivered or OrderStatus.Cancelled) { TempData["Error"] = "Only unshipped orders can be cancelled."; return RedirectToAction(nameof(Details), new { id }); }
-        foreach (var item in order.Items) { var product = await db.Products.FindAsync(item.ProductId); if (product is not null) product.StockQuantity += item.Quantity; }
-        order.Status = OrderStatus.Cancelled; order.IsArchived = true; await db.SaveChangesAsync(); TempData["Success"] = "Order cancelled, payment simulation voided, and stock restored."; return RedirectToAction(nameof(Index));
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        var cancelled = await db.Orders.Where(x => x.Id == id &&
+                (x.Status == OrderStatus.Paid || x.Status == OrderStatus.Processing))
+            .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.Status, OrderStatus.Cancelled)
+                .SetProperty(x => x.IsArchived, true));
+        if (cancelled == 0)
+        {
+            TempData["Error"] = "Only unshipped orders can be cancelled.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        foreach (var item in order.Items.OrderBy(x => x.ProductId))
+        {
+            await db.Products.Where(x => x.Id == item.ProductId)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.StockQuantity, x => x.StockQuantity + item.Quantity));
+        }
+
+        if (order.CouponCode is not null)
+        {
+            await db.CustomerCoupons.Where(x => x.UserId == order.UserId && x.Code == order.CouponCode)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.Quantity, x => x.Quantity + 1));
+        }
+
+        await transaction.CommitAsync();
+        TempData["Success"] = order.CouponCode is null
+            ? "Order cancelled, payment simulation voided, and stock restored."
+            : $"Order cancelled. Stock and coupon {order.CouponCode} were restored.";
+        return RedirectToAction(nameof(Index));
     }
 }

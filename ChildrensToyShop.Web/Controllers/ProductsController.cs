@@ -2,6 +2,8 @@ using ChildrensToyShop.Web.Data;
 using ChildrensToyShop.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChildrensToyShop.Web.Controllers;
@@ -35,14 +37,32 @@ public class ProductsController(ApplicationDbContext db) : Controller
     }
 
     [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> LowStock()
+    {
+        var products = await db.Products.AsNoTracking()
+            .Where(x => x.IsActive && x.Status != ProductStatus.Discontinued && x.StockQuantity < x.ReorderThreshold)
+            .OrderByDescending(x => x.ReorderThreshold - x.StockQuantity)
+            .ThenBy(x => x.Title)
+            .ToListAsync();
+
+        return View(products);
+    }
+
+    [Authorize(Roles = "Admin")]
     public IActionResult Create() => View("Edit", new Product());
 
     [Authorize(Roles = "Admin"), HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Product product)
     {
-        if (!ModelState.IsValid) return View("Edit", product);
-        if (await db.Products.AnyAsync(x => x.Sku == product.Sku)) { ModelState.AddModelError("Sku", "SKU already exists."); return View("Edit", product); }
-        db.Products.Add(product); await db.SaveChangesAsync(); TempData["Success"] = "Toy added to the catalogue."; return RedirectToAction(nameof(Index));
+        product.Id = 0;
+        if (!await ValidateProductAsync(product)) return View("Edit", product);
+
+        product.CreatedAt = DateTime.UtcNow;
+        db.Products.Add(product);
+        if (!await SaveProductAsync()) return View("Edit", product);
+
+        TempData["Success"] = "Toy added to the catalogue.";
+        return RedirectToAction(nameof(Index));
     }
 
     [Authorize(Roles = "Admin")]
@@ -51,9 +71,44 @@ public class ProductsController(ApplicationDbContext db) : Controller
     [Authorize(Roles = "Admin"), HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Product product)
     {
-        if (!ModelState.IsValid) return View(product);
-        if (await db.Products.AnyAsync(x => x.Sku == product.Sku && x.Id != product.Id)) { ModelState.AddModelError("Sku", "SKU already exists."); return View(product); }
-        db.Update(product); await db.SaveChangesAsync(); TempData["Success"] = "Toy details updated."; return RedirectToAction(nameof(Index));
+        var existing = await db.Products.FindAsync(product.Id);
+        if (existing is null) return NotFound();
+        if (!await ValidateProductAsync(product)) return View(product);
+
+        product.CreatedAt = existing.CreatedAt;
+        db.Entry(existing).CurrentValues.SetValues(product);
+        if (!await SaveProductAsync()) return View(product);
+
+        TempData["Success"] = "Toy details updated.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    private async Task<bool> ValidateProductAsync(Product product)
+    {
+        product.SafetyNotes ??= string.Empty;
+        product.SafetyCertification ??= string.Empty;
+        if (ModelState.GetFieldValidationState(nameof(Product.Sku)) == ModelValidationState.Valid)
+        {
+            product.Sku = product.Sku.Trim();
+            if (await db.Products.AnyAsync(x => x.Sku == product.Sku && x.Id != product.Id))
+                ModelState.AddModelError(nameof(Product.Sku), "A toy with this SKU already exists.");
+        }
+
+        return ModelState.IsValid;
+    }
+
+    private async Task<bool> SaveProductAsync()
+    {
+        try
+        {
+            await db.SaveChangesAsync();
+            return true;
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException { Number: 2601 or 2627 })
+        {
+            ModelState.AddModelError(nameof(Product.Sku), "A toy with this SKU already exists.");
+            return false;
+        }
     }
 
     [Authorize(Roles = "Admin"), HttpPost, ValidateAntiForgeryToken]

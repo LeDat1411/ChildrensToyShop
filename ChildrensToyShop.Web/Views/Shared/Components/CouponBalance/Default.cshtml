@@ -1,0 +1,9 @@
+@model Dictionary<string, int>
+
+<div class="small text-white mt-1">
+    Coupons
+    @foreach (var coupon in CouponType.All)
+    {
+        <span class="badge text-bg-light ms-1" data-coupon="@coupon.Code">@coupon.Code: @Model.GetValueOrDefault(coupon.Code).ToString("N0")</span>
+    }
+</div>

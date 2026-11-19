@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace ChildrensToyShop.Web.Models;
 
@@ -25,15 +26,22 @@ public class ProductListViewModel
 public class CartViewModel
 {
     public ShoppingCart Cart { get; set; } = new();
+    public IReadOnlyList<CustomerCoupon> Coupons { get; set; } = [];
+    public CouponType? AppliedCoupon => CouponType.Find(Cart.CouponCode);
     public decimal Subtotal => Cart.Items.Sum(x => (x.Product?.Price ?? 0) * x.Quantity);
     public decimal GiftWrapFee => Cart.Items.Where(x => x.GiftWrap).Sum(x => 2.50m * x.Quantity);
     public decimal Tax => Math.Round((Subtotal + GiftWrapFee) * .10m, 2);
-    public decimal Total => Subtotal + GiftWrapFee + Tax;
+    private decimal TotalBeforeDiscount => Subtotal + GiftWrapFee + Tax;
+    public decimal DiscountAmount => Math.Round(
+        TotalBeforeDiscount * (AppliedCoupon?.Percent ?? 0) / 100m, 2, MidpointRounding.AwayFromZero);
+    public decimal Total => TotalBeforeDiscount - DiscountAmount;
 }
 
 public class CheckoutViewModel
 {
     [Required, StringLength(300), Display(Name = "Shipping address")]
     public string ShippingAddress { get; set; } = string.Empty;
+    public string? ExpectedCouponCode { get; set; }
+    [BindNever]
     public CartViewModel Cart { get; set; } = new();
 }

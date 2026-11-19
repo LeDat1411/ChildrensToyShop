@@ -1,0 +1,13 @@
+@model CartViewModel
+
+<dl>
+    <dt>Subtotal</dt><dd>$@Model.Subtotal.ToString("0.00")</dd>
+    <dt>Gift wrap</dt><dd>$@Model.GiftWrapFee.ToString("0.00")</dd>
+    <dt>Tax</dt><dd>$@Model.Tax.ToString("0.00")</dd>
+    @if (Model.AppliedCoupon is { } coupon)
+    {
+        <dt>Coupon @coupon.Code (@coupon.Percent% off)</dt>
+        <dd>−$@Model.DiscountAmount.ToString("0.00")</dd>
+    }
+    <dt class="total">Total</dt><dd class="total">$@Model.Total.ToString("0.00")</dd>
+</dl>
