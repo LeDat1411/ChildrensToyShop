@@ -211,4 +211,3 @@ C:\Users\Admin\source\repos\ChildrensToyShop.Web\obj\CouponQa\runtimes\osx-x64\n
 C:\Users\Admin\source\repos\ChildrensToyShop.Web\obj\CouponQa\runtimes\win-arm64\native\msalruntime_arm64.dll
 C:\Users\Admin\source\repos\ChildrensToyShop.Web\obj\CouponQa\runtimes\win-x64\native\msalruntime.dll
 C:\Users\Admin\source\repos\ChildrensToyShop.Web\obj\CouponQa\runtimes\win-x86\native\msalruntime_x86.dll
-C:\Users\Admin\source\repos\ChildrensToyShop.Web\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

@@ -6,6 +6,38 @@ namespace ChildrensToyShop.Tests;
 
 public sealed partial class ShopSystemTests
 {
+    [Fact]
+    public async Task UC29_TC16_Archived_toy_leaves_catalogue_but_remains_in_existing_order()
+    {
+        await Login();
+        var toy = await Toy(Explorer);
+        await AddToCart(Explorer);
+        await PlaceOrder();
+        var orderLine = page.Locator(".order-line").Filter(new() { HasText = toy.Sku });
+        await Expect(orderLine).ToContainTextAsync(Explorer);
+        var orderPath = new Uri(page.Url).AbsolutePath;
+        var searchPath = $"/Products?search={Uri.EscapeDataString(toy.Sku)}";
+
+        await page.GotoAsync(searchPath);
+        var toyHeading = page.GetByRole(AriaRole.Heading, new() { Name = Explorer, Exact = true });
+        await Expect(toyHeading).ToBeVisibleAsync();
+
+        await using var adminContext = await NewAdminContext();
+        var admin = await adminContext.NewPageAsync();
+        await Login("admin", session: admin);
+        await admin.GotoAsync(searchPath);
+        admin.Dialog += async (_, dialog) => await dialog.AcceptAsync();
+        await admin.GetByRole(AriaRole.Button, new() { Name = "Archive", Exact = true }).ClickAsync();
+        await Expect(admin.GetByRole(AriaRole.Alert)).ToContainTextAsync("Toy was archived");
+
+        await page.ReloadAsync();
+        await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "No toys matched those filters." })).ToBeVisibleAsync();
+        await Expect(toyHeading).ToHaveCountAsync(0);
+        await page.GotoAsync(orderPath);
+        await Expect(orderLine).ToBeVisibleAsync();
+        await Expect(orderLine).ToContainTextAsync(Explorer);
+    }
+
     private Task<IBrowserContext> NewAdminContext() => browser!.NewContextAsync(new()
     {
         BaseURL = new Uri(page.Url).GetLeftPart(UriPartial.Authority),

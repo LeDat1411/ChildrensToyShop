@@ -8,6 +8,23 @@ namespace ChildrensToyShop.Tests;
 
 public sealed partial class ShopSystemTests
 {
+    [Theory]
+    [InlineData("admin")]
+    [InlineData("customer")]
+    public async Task UC23_TC15_Sign_out_ends_the_session(string account)
+    {
+        await Login(account);
+        await Expect(Button("Sign out")).ToBeVisibleAsync();
+        var homeUrl = new Uri(new Uri(page.Url), "/").AbsoluteUri;
+
+        await Button("Sign out").ClickAsync();
+        await Expect(page).ToHaveURLAsync(homeUrl);
+        await Expect(page.GetByRole(AriaRole.Link, new() { Name = "Sign in", Exact = true })).ToBeVisibleAsync();
+
+        await page.GotoAsync("/Cart");
+        await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Sign in to your shop account" })).ToBeVisibleAsync();
+    }
+
     [Theory, InlineData("admin", "Toy Shop Admin"), InlineData("customer", "Sample Customer")]
     public async Task TC01_Valid_login_shows_role_home(string account, string name)
     {
