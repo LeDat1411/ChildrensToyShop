@@ -5,11 +5,11 @@
     <h1>Low Stock Alerts</h1>
     <a class="btn btn-outline-primary" asp-action="Index">View catalogue</a>
 </div>
-<p>Listed toys appear here when their stock quantity drops below their reorder threshold.</p>
+<p>Listed toys appear here when their stock quantity is at or below their reorder threshold.</p>
 
 @if (Model.Count == 0)
 {
-    <div class="empty-state"><h2>No toys are below their reorder threshold.</h2></div>
+    <div class="empty-state"><h2>No toys are at or below their reorder threshold.</h2></div>
 }
 else
 {

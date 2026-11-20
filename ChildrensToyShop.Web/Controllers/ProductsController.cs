@@ -40,7 +40,7 @@ public class ProductsController(ApplicationDbContext db) : Controller
     public async Task<IActionResult> LowStock()
     {
         var products = await db.Products.AsNoTracking()
-            .Where(x => x.IsActive && x.Status != ProductStatus.Discontinued && x.StockQuantity < x.ReorderThreshold)
+            .Where(x => x.IsActive && x.Status != ProductStatus.Discontinued && x.StockQuantity <= x.ReorderThreshold)
             .OrderByDescending(x => x.ReorderThreshold - x.StockQuantity)
             .ThenBy(x => x.Title)
             .ToListAsync();
